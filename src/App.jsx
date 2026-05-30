@@ -1,121 +1,86 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React from 'react'
+import { useState, useCallback,useEffect,useRef  } from 'react'
+const App = () => {
+  const [lenght, setLenght] = useState(8)
+  const [number, setNumber] = useState(false)
+  const [character, setCharacter] = useState(false)
+  const [password, setPassword] = useState("")
+  const inputref = useRef(null)
 
-function App() {
-  const [count, setCount] = useState(0)
+  const passwordGenerator = useCallback(() => {
+    let pass = ""
+    let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    if (number) str += '0123456789'
+    if (character) str += "`~!@#$%^&*(){}[]"
+
+    for (let i = 1; i <= lenght; i++) {
+      let char = Math.floor(Math.random() * str.length + 1)
+      pass += str.charAt(char)
+    }
+
+    setPassword(pass)
+  }, [lenght, number, character, setPassword])
+  
+  useEffect(()=>{
+    passwordGenerator()
+  },[lenght,number,character,passwordGenerator])
+
+  const selectInput = useCallback(()=>{
+    console.log("button Clicked")
+    inputref.current?.select();
+    window.navigator.clipboard.writeText(password)
+    inputref.current?.select();
+  },[password])
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className='h-screen bg-black flex justify-center items-center'>
+      <div className='w-[80%] p-6 flex flex-col gap-3  bg-blue-400 rounded-2xl'>
+        <div className='flex bg-white rounded-xl'>
+          <input
+            type="text"
+            value={password}
+            placeholder='Password'
+            className='outline-none py-1 px-2 w-[90%]'
+            ref={inputref}
+            readOnly />
+          <button
+            className='bg-amber-300 w-[10%] rounded-r-xl px-3 text-xl' onClick={selectInput}>Copy</button>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+        <div className='flex justify-between'>
 
-      <div className="ticks"></div>
+          <div className='flex gap-2'>
+            <input
+              type="range"
+              min={6}
+              max={100}
+              value={lenght}
+              className='cursor-pointer'
+              onChange={(e) => {
+                setLenght(e.target.value)
+              }} />
+            <label className='text-white' >length : {lenght}</label>
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <div className='flex gap-2'>
+            <input
+              type="checkbox"
+              className='outline-none cursor-pointer' 
+              value={number} 
+              onChange={()=>{ setNumber((prev)=> !prev)}} />
+            <label className='text-white'>Number</label>
+          </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+          <div className='flex gap-2'>
+            <input type="checkbox"
+              className='outline-none cursor-pointer'
+              value={character} 
+              onChange={()=>{ setCharacter((prev)=> !prev)}} />
+            <label className='text-white' >Character</label>
+          </div>
+
+        </div>
+      </div>
+    </div>
   )
 }
 
